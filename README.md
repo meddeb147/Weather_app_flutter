@@ -17,6 +17,7 @@ same little world to care for the mascot, and for her, together.
 | `docs/mascots/00-style-guide.md` | Shared visual rules, the moon charm, phase and reaction system, deliverables for the 3D artist |
 | `docs/mascots/01-launch-lineup.md` | Character sheets: Momo, Cat, Duck, Koala, Pufferfish (V1) |
 | `docs/mascots/02-later-friends.md` | Character sheets: Seal Pup, Tiger Cub, Penguin, Capybara, Axolotl (V3) |
+| `docs/mascots/03-image-prompts.md` | Ready-to-run image generation prompts for concept art of each mascot |
 
 No app code yet. The previous Flutter weather app was removed from this branch;
 it is still available on `master`.
