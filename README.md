@@ -1,16 +1,22 @@
-# Weather app
+# Momo & Friends (working title)
 
-A new Flutter project.
+**The cycle tracker you raise together.**
 
-## Getting Started
+A cute, privacy-first period and cycle tracker for iPhone. Every woman gets a 3D
+mascot that matches her period personality, and her partner and friends join the
+same little world to care for the mascot, and for her, together.
 
-This project is a starting point for a Flutter application.
+- Platform: iOS first, React Native + Expo (TypeScript)
+- Languages at launch: English, French, Arabic (right-to-left)
+- Privacy: her health log stays on her iPhone; only the mascot state she chooses is shared
 
-A few resources to get you started if this is your first Flutter project:
+## Repository contents
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+| Path | What it is |
+| --- | --- |
+| `docs/mascots/00-style-guide.md` | Shared visual rules, the moon charm, phase and reaction system, deliverables for the 3D artist |
+| `docs/mascots/01-launch-lineup.md` | Character sheets: Momo, Cat, Duck, Koala, Pufferfish (V1) |
+| `docs/mascots/02-later-friends.md` | Character sheets: Seal Pup, Tiger Cub, Penguin, Capybara, Axolotl (V3) |
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+No app code yet. The previous Flutter weather app was removed from this branch;
+it is still available on `master`.
