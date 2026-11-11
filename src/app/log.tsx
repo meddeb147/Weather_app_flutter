@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { StepNav } from '@/components/month-nav';
 import { Body, Button, Card, Chip, ChipRow, Heading, Screen } from '@/components/ui';
 import { emptyLog, useStore } from '@/data/store';
-import { MOODS, SYMPTOMS, type DailyLog, type Flow } from '@/data/types';
+import { MOOD_EMOJI, MOODS, SYMPTOMS, type DailyLog, type Flow } from '@/data/types';
 import { addDays, formatDate } from '@/lib/dates';
 import { PHASE_COLORS } from '@/lib/mascots';
 
@@ -27,19 +27,19 @@ export default function LogScreen() {
   const title = date === today ? t('common.today') : formatDate(date, i18n.language, { weekday: 'short', day: 'numeric', month: 'long' });
 
   return (
-    <Screen>
+    <Screen tint="#FFE3D8">
       <StepNav title={title} onStep={(delta) => goTo(addDays(date, delta))} canGoForward={date < today} />
 
-      <Card>
+      <Card index={0}>
         <Heading>{t('log.mood')}</Heading>
         <ChipRow>
           {MOODS.map((m) => (
-            <Chip key={m} label={t(`mood.${m}`)} selected={log.mood === m} onPress={() => update({ mood: log.mood === m ? null : m })} />
+            <Chip key={m} emoji={MOOD_EMOJI[m]} label={t(`mood.${m}`)} selected={log.mood === m} onPress={() => update({ mood: log.mood === m ? null : m })} />
           ))}
         </ChipRow>
       </Card>
 
-      <Card>
+      <Card index={1}>
         <Heading>{t('log.symptoms')}</Heading>
         <ChipRow>
           {SYMPTOMS.map((s) => {
@@ -57,7 +57,7 @@ export default function LogScreen() {
         </ChipRow>
       </Card>
 
-      <Card>
+      <Card index={2}>
         <Heading>{t('flow.title')}</Heading>
         <ChipRow>
           {FLOWS.map((f) => (
@@ -66,7 +66,7 @@ export default function LogScreen() {
         </ChipRow>
       </Card>
 
-      <Card>
+      <Card index={3}>
         <Heading>{t('log.period')}</Heading>
         {period ? (
           <>
@@ -81,6 +81,7 @@ export default function LogScreen() {
       <Body soft style={{ textAlign: 'center' }}>
         {t('log.saved')}
       </Body>
+      <Button label={t('extra.done')} onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
     </Screen>
   );
 }

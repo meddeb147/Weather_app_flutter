@@ -4,7 +4,7 @@ import * as SQLite from 'expo-sqlite';
 
 import type { Period } from '@/lib/cycle/engine';
 
-import { EMPTY_DATA, type AppData, type DailyLog, type Language, type LocalStorage, type Profile } from './types';
+import { DEFAULT_SETTINGS, EMPTY_DATA, type AppData, type DailyLog, type KVKey, type LocalStorage } from './types';
 
 /**
  * On-device storage: a SQLCipher-encrypted SQLite file. The key is generated
@@ -41,7 +41,7 @@ function db(): Promise<SQLite.SQLiteDatabase> {
   return dbPromise;
 }
 
-async function setKV(key: string, value: unknown): Promise<void> {
+async function setKV(key: KVKey, value: unknown): Promise<void> {
   const d = await db();
   if (value === null) await d.runAsync('DELETE FROM kv WHERE key = ?', key);
   else await d.runAsync('INSERT OR REPLACE INTO kv (key, value) VALUES (?, ?)', key, JSON.stringify(value));
@@ -57,10 +57,17 @@ export const storage: LocalStorage = {
     const rows = await d.getAllAsync<{ date: string; mood: string | null; symptoms: string; flow: number }>('SELECT * FROM daily_logs');
     const logs: AppData['logs'] = {};
     for (const r of rows) logs[r.date] = { date: r.date, mood: r.mood, symptoms: JSON.parse(r.symptoms), flow: r.flow } as DailyLog;
-    return { ...EMPTY_DATA, profile: kv.profile ?? null, language: kv.language ?? null, periods, logs };
+    return {
+      ...EMPTY_DATA,
+      profile: kv.profile ?? null,
+      language: kv.language ?? null,
+      comfort: kv.comfort ?? [],
+      settings: { ...DEFAULT_SETTINGS, ...kv.settings },
+      periods,
+      logs,
+    };
   },
-  saveProfile: (profile: Profile | null) => setKV('profile', profile),
-  saveLanguage: (language: Language | null) => setKV('language', language),
+  saveKV: setKV,
   async savePeriods(periods: Period[]) {
     const d = await db();
     await d.withTransactionAsync(async () => {

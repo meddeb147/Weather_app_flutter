@@ -1,25 +1,50 @@
 import { createContext, use, useEffect, useMemo, useState, type ReactNode } from 'react';
 
-import { predict, sortPeriods, type CycleInputs, type Period, type Prediction } from '@/lib/cycle/engine';
+import { cycleLengths, predict, sortPeriods, type CycleInputs, type Period, type Prediction } from '@/lib/cycle/engine';
 import { addDays, today, type ISODate } from '@/lib/dates';
 
 import { storage } from './storage';
-import { EMPTY_DATA, type AppData, type DailyLog, type Language, type Profile } from './types';
+import { EMPTY_DATA, type AppData, type ComfortCategory, type DailyLog, type KVKey, type Language, type Profile, type Settings } from './types';
+
+export type Stage = 'baby' | 'friend' | 'bestFriend';
+
+export interface Growth {
+  /** Completed cycles: each one levels the mascot up. */
+  level: number;
+  stage: Stage;
+  nextStage: Stage | null;
+  cyclesToNext: number;
+  /** 0 to 1 progress through the current stage. */
+  progress: number;
+}
+
+export function growthFor(completedCycles: number): Growth {
+  const level = completedCycles + 1;
+  if (completedCycles < 3) return { level, stage: 'baby', nextStage: 'friend', cyclesToNext: 3 - completedCycles, progress: completedCycles / 3 };
+  if (completedCycles < 9) return { level, stage: 'friend', nextStage: 'bestFriend', cyclesToNext: 9 - completedCycles, progress: (completedCycles - 3) / 6 };
+  return { level, stage: 'bestFriend', nextStage: null, cyclesToNext: 0, progress: 1 };
+}
 
 interface Store extends AppData {
   ready: boolean;
   today: ISODate;
   cycleInputs: CycleInputs;
   prediction: Prediction | null;
+  growth: Growth;
+  /** True when she said she is fine today: the mascot shows a happy face. */
+  fineToday: boolean;
   /** The period that contains `date`, if any. */
   periodOn(date: ISODate): Period | null;
   setProfile(profile: Profile): void;
   setLanguage(language: Language | null): void;
+  updateSettings(change: Partial<Settings>): void;
   addPeriod(period: Period): void;
   startPeriod(date: ISODate): void;
   endPeriod(date: ISODate): void;
   removePeriod(start: ISODate): void;
   saveLog(log: DailyLog): void;
+  addComfort(category: ComfortCategory, text: string): void;
+  removeComfort(id: string): void;
   wipe(): void;
 }
 
@@ -54,6 +79,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const periodOn = (date: ISODate) =>
       data.periods.find((p) => date >= p.start && date <= (p.end ?? addDays(p.start, fallbackLength - 1))) ?? null;
 
+    const write = <K extends KVKey>(key: K, value: AppData[K]) => {
+      setData((d) => ({ ...d, [key]: value }));
+      storage.saveKV(key, value).catch(console.warn);
+    };
     const writePeriods = (periods: Period[]) => {
       const sorted = sortPeriods(periods);
       setData((d) => ({ ...d, periods: sorted }));
@@ -66,15 +95,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       today: now,
       cycleInputs,
       prediction,
+      growth: growthFor(cycleLengths(data.periods).length),
+      fineToday: data.settings.fineOn === now,
       periodOn,
-      setProfile(profile) {
-        setData((d) => ({ ...d, profile }));
-        storage.saveProfile(profile).catch(console.warn);
-      },
-      setLanguage(language) {
-        setData((d) => ({ ...d, language }));
-        storage.saveLanguage(language).catch(console.warn);
-      },
+      setProfile: (profile) => write('profile', profile),
+      setLanguage: (language) => write('language', language),
+      updateSettings: (change) => write('settings', { ...data.settings, ...change }),
       addPeriod(period) {
         if (data.periods.some((p) => p.start === period.start)) return;
         writePeriods([...data.periods, period]);
@@ -96,11 +122,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setData((d) => ({ ...d, logs: { ...d.logs, [log.date]: log } }));
         storage.saveLog(log).catch(console.warn);
       },
+      addComfort(category, text) {
+        const clean = text.trim();
+        if (!clean) return;
+        write('comfort', [...data.comfort, { id: `${Date.now()}-${data.comfort.length}`, category, text: clean }]);
+      },
+      removeComfort: (id) => write('comfort', data.comfort.filter((c) => c.id !== id)),
       wipe() {
         setData({ ...EMPTY_DATA, language: data.language });
         storage
           .wipe()
-          .then(() => storage.saveLanguage(data.language))
+          .then(() => storage.saveKV('language', data.language))
           .catch(console.warn);
       },
     };

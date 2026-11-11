@@ -10,7 +10,9 @@ const KEY = 'momo.preview';
 function read(): AppData {
   try {
     const raw = globalThis.localStorage?.getItem(KEY);
-    return raw ? { ...EMPTY_DATA, ...JSON.parse(raw) } : { ...EMPTY_DATA };
+    if (!raw) return { ...EMPTY_DATA };
+    const saved = JSON.parse(raw) as Partial<AppData>;
+    return { ...EMPTY_DATA, ...saved, settings: { ...EMPTY_DATA.settings, ...saved.settings } };
   } catch {
     return { ...EMPTY_DATA };
   }
@@ -26,8 +28,7 @@ function patch(change: Partial<AppData>): void {
 
 export const storage: LocalStorage = {
   load: async () => read(),
-  saveProfile: async (profile) => patch({ profile }),
-  saveLanguage: async (language) => patch({ language }),
+  saveKV: async (key, value) => patch({ [key]: value }),
   savePeriods: async (periods) => patch({ periods }),
   saveLog: async (log) => patch({ logs: { ...read().logs, [log.date]: log } }),
   wipe: async () => patch({ ...EMPTY_DATA }),

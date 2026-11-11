@@ -1,4 +1,4 @@
-import { cycleLengths, dayKind, predict, type CycleInputs, type Period } from './engine';
+import { cycleLengths, dayKind, phaseSegments, predict, type CycleInputs, type Period } from './engine';
 
 const p = (start: string, end: string | null = null): Period => ({ start, end });
 const inputs = (periods: Period[], over: Partial<CycleInputs> = {}): CycleInputs => ({
@@ -97,5 +97,15 @@ describe('dayKind', () => {
     expect(dayKind('2026-04-09', i, r)).toBe('ovulation');
     expect(dayKind('2026-04-06', i, r)).toBe('fertile');
     expect(dayKind('2026-04-15', i, r)).toBe('none');
+  });
+});
+
+describe('phaseSegments', () => {
+  it('splits the cycle into four phases that add up to its length', () => {
+    const r = predict(inputs([p('2026-01-01', '2026-01-05'), p('2026-01-29', '2026-02-02'), p('2026-02-26', '2026-03-02')]), '2026-03-05')!;
+    const segments = phaseSegments(r);
+    expect(segments.map((s) => s.phase)).toEqual(['menstrual', 'follicular', 'ovulation', 'luteal']);
+    expect(segments.reduce((sum, s) => sum + s.days, 0)).toBe(r.cycleLength);
+    expect(segments[3].days).toBe(12);
   });
 });

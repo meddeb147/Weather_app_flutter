@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { addDays, toISO, type ISODate } from '@/lib/dates';
 
-import { colors, space } from './theme';
+import { colors, font, space } from './theme';
 
 export interface DayLook {
   fill?: string;
@@ -16,6 +16,8 @@ interface Props {
   month: number;
   locale: string;
   look?: (date: ISODate) => DayLook;
+  /** Days that get a small dot (for example, days with a log). */
+  dot?: (date: ISODate) => boolean;
   onPress: (date: ISODate) => void;
   selected?: ISODate | null;
   today: ISODate;
@@ -24,7 +26,7 @@ interface Props {
 }
 
 /** One month, weeks starting on Monday. */
-export function MonthGrid({ year, month, locale, look, onPress, selected, today, maxDate }: Props) {
+export function MonthGrid({ year, month, locale, look, dot, onPress, selected, today, maxDate }: Props) {
   const first = toISO(new Date(year, month, 1));
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const leading = (new Date(year, month, 1).getDay() + 6) % 7;
@@ -75,6 +77,7 @@ export function MonthGrid({ year, month, locale, look, onPress, selected, today,
                   <Text style={[styles.dayLabel, l.textColor !== undefined && { color: l.textColor }, isSelected && styles.selectedLabel, disabled && styles.disabled]}>
                     {dayNumber.format(Number(date.slice(8)))}
                   </Text>
+                  {dot?.(date) && <View style={[styles.dot, (isSelected || l.textColor !== undefined) && styles.dotLight]} />}
                 </View>
               </Pressable>
             );
@@ -88,12 +91,14 @@ export function MonthGrid({ year, month, locale, look, onPress, selected, today,
 const styles = StyleSheet.create({
   grid: { gap: space.xs },
   row: { flexDirection: 'row' },
-  weekday: { flex: 1, textAlign: 'center', color: colors.textSoft, fontSize: 13, fontWeight: '600', paddingBottom: space.xs },
+  weekday: { flex: 1, textAlign: 'center', color: colors.textSoft, fontSize: 13, fontFamily: font.bold, paddingBottom: space.xs },
   cell: { flex: 1, height: 46, alignItems: 'center', justifyContent: 'center' },
   day: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  dayLabel: { fontSize: 15, color: colors.text, fontWeight: '500' },
+  dayLabel: { fontSize: 15, lineHeight: 22, color: colors.text, fontFamily: font.semi },
   today: { borderWidth: 2, borderColor: colors.text },
   selected: { backgroundColor: colors.brand },
-  selectedLabel: { color: colors.white, fontWeight: '700' },
+  selectedLabel: { color: colors.white, fontFamily: font.bold },
   disabled: { color: '#CDBDB6' },
+  dot: { position: 'absolute', bottom: 4, width: 5, height: 5, borderRadius: 3, backgroundColor: colors.brand },
+  dotLight: { backgroundColor: colors.white },
 });

@@ -193,3 +193,19 @@ export function dayKind(date: ISODate, inputs: CycleInputs, prediction: Predicti
   }
   return 'none';
 }
+
+/** How many days of the cycle each phase takes, in order. Used to draw the cycle ring. */
+export function phaseSegments(p: Prediction): { phase: Phase; days: number }[] {
+  const total = Math.max(p.cycleLength, p.periodLength + 6);
+  const ovulationDay = total - LUTEAL_LENGTH + 1;
+  const menstrual = p.periodLength;
+  const follicular = Math.max(1, ovulationDay - 2 - menstrual);
+  const ovulation = 3;
+  const luteal = Math.max(1, total - menstrual - follicular - ovulation);
+  return [
+    { phase: 'menstrual', days: menstrual },
+    { phase: 'follicular', days: follicular },
+    { phase: 'ovulation', days: ovulation },
+    { phase: 'luteal', days: luteal },
+  ];
+}

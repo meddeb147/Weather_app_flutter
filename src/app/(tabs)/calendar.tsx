@@ -2,11 +2,12 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { MonthGrid, type DayLook } from '@/components/month-grid';
 import { StepNav } from '@/components/month-nav';
 import { colors, space } from '@/components/theme';
-import { Body, Card, Screen } from '@/components/ui';
+import { Body, Card, Screen, Title } from '@/components/ui';
 import { useStore } from '@/data/store';
 import { dayKind, type DayKind } from '@/lib/cycle/engine';
 import { toDate } from '@/lib/dates';
@@ -20,7 +21,7 @@ const LOOKS: Record<DayKind, DayLook> = {
 };
 
 export default function CalendarScreen() {
-  const { cycleInputs, prediction, today } = useStore();
+  const { cycleInputs, prediction, today, logs } = useStore();
   const { t, i18n } = useTranslation();
   const [cursor, setCursor] = useState(() => {
     const d = toDate(today);
@@ -41,10 +42,16 @@ export default function CalendarScreen() {
   ];
 
   return (
-    <Screen>
+    <Screen tint="#FFE3EA">
+      <Title>{t('tabs.calendar')}</Title>
       <StepNav title={title} onStep={step} />
       <Card>
+        <Animated.View key={`${cursor.year}-${cursor.month}`} entering={FadeIn.duration(260)}>
         <MonthGrid
+          dot={(date) => {
+            const l = logs[date];
+            return l !== undefined && (l.mood !== null || l.symptoms.length > 0 || l.flow > 0);
+          }}
           year={cursor.year}
           month={cursor.month}
           locale={i18n.language}
@@ -54,6 +61,7 @@ export default function CalendarScreen() {
             if (date <= today) router.push({ pathname: '/log', params: { date } });
           }}
         />
+        </Animated.View>
       </Card>
       <View style={styles.legend}>
         {legend.map(([kind, label]) => (

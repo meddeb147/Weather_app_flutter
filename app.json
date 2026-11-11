@@ -25,12 +25,36 @@
     },
     "plugins": [
       "expo-router",
-      ["expo-splash-screen", { "backgroundColor": "#FFF1E0", "image": "./assets/images/splash-icon.png", "imageWidth": 76 }],
-      ["expo-sqlite", { "useSQLCipher": true }],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FFF1E0",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 76
+        }
+      ],
+      [
+        "expo-sqlite",
+        {
+          "useSQLCipher": true
+        }
+      ],
       "expo-secure-store",
-      "expo-localization"
+      "expo-localization",
+      "expo-font",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow Momo & Friends to use Face ID to keep your cycle private."
+        }
+      ]
     ],
-    "extra": { "supportsRTL": true },
-    "experiments": { "typedRoutes": true, "reactCompiler": true }
+    "extra": {
+      "supportsRTL": true
+    },
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
   }
 }

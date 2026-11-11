@@ -14,17 +14,21 @@ same little world to care for the mascot, and for her, together.
 
 | Area | Status |
 | --- | --- |
-| Onboarding quiz ("What's your period animal?") | 8 questions, scoring for the 5 launch mascots, reveal screen, share |
+| Onboarding quiz ("What's your period animal?") | 8 questions, scoring for the 5 launch mascots, animated reveal, share |
+| Mascots | Five drawn mascots with moods per phase, idle bob, blinking, happy bounce and a moon charm that follows her cycle |
+| Home | Cycle ring with today's marker, mascot's voice, countdown, one-tap mood, "I'm actually fine today!" override |
 | Cycle predictions | Learned from her own history; date range + confidence for irregular or new cycles |
-| Four phases | Shown on home, drive the mascot's voice and moon charm |
 | Logging | One-tap period start/end; mood, symptoms and flow saved on every tap |
-| Calendar | Logged periods, predicted periods, fertile window, ovulation |
-| Settings | Change mascot, retake quiz, language, delete all data |
-| Storage | SQLCipher-encrypted SQLite, key in the iOS Keychain |
+| Calendar | Logged periods, predicted periods, fertile window, ovulation, dots on logged days |
+| Together | Care gifts with animation and love points, Comfort List, sharing controls, preview of what a partner will see |
+| Insights | Mascot growth (Baby, Friend, Best friend), cycle stats and history, most logged symptoms and moods |
+| Me | Change mascot, retake quiz, language, Face ID lock, delete all data |
+| Storage | On the phone only: SQLCipher-encrypted SQLite, key in the iOS Keychain. No server. |
 
-Not built yet: partner link and mascot sync, care gifts, Comfort List, widgets,
-notifications, Apple Health, Face ID lock, real mascot art (the mascots are
-placeholder shapes until the 3D renders exist).
+Not built yet (these need a backend or native iOS targets): real partner link
+and mascot sync, crew mode, push and local notifications, widgets, Apple Health.
+The mascots are 2D drawings standing in for the 3D renders described in
+`docs/mascots/`.
 
 ## Run it
 
@@ -55,7 +59,7 @@ npm run typecheck
 | `src/lib/quiz/quiz.ts` | Quiz questions and scoring |
 | `src/data/` | On-device storage and app state |
 | `src/i18n/` | English, French and Arabic strings |
-| `src/components/` | Shared UI, month grid, placeholder mascot |
+| `src/components/` | Shared UI, mascots, cycle ring, tab bar, animations |
 | `docs/mascots/` | Style guide, character sheets and image prompts for the 3D artist |
 | `docs/screenshots/` | Browser-preview screenshots of the current build |
 
